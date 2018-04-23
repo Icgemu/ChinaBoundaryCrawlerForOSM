@@ -102,7 +102,7 @@ ENV/
 
 
 #local file
-
+*.csv
 *.txt
 boundary/
 *.tar.gz
