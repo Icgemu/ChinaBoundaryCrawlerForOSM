@@ -31,7 +31,7 @@ def process_relation(rid, out) :
         nds = sel.xpath(nd_rels)
         ways_dict[way] = nds
         ways_id.append(way)
-    ok = False
+    ok = True
     for i in range(1,len(ways_id),1) :
         sub = ways_id[i:]
         end_node_id = ways_dict[ways_id[i-1]][-1]
@@ -43,13 +43,11 @@ def process_relation(rid, out) :
                 tmp = ways_id[i]
                 ways_id[i] = v
                 ways_id[i+k] = tmp
-                ok = True
             if ways_dict[v][-1] == end_node_id:
                 tmp = ways_id[i]
                 ways_id[i] = v
                 ways_id[i+k] = tmp
                 ways_dict[v].reverse()
-                ok = True
         #print('%s->%s:%s' % (ways_dict[ways_id[i-1]][-1],ways_dict[ways_id[i]][0],ways_dict[ways_id[i-1]][-1]==ways_dict[ways_id[i]][0]))
     if not ok :
         print("Relation %s uncomplete." % (rid,))
