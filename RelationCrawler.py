@@ -96,7 +96,11 @@ def process_relation(rid) :
             #print("node->(%s/%s)" % (nd,len(nds)))
             path.append(nodes_dict[nd].replace(',',' '))
     if len(path) >0:
-        print('%s->%s:%s=>%s:%s' % (rid,ways_dict[ways_id[0]][0], ways_dict[ways_id[-1]][-1],path[0],path[-1]))
+        head = ways_dict[ways_id[0]][0]
+        tail = ways_dict[ways_id[-1]][-1]
+        if head != tail :
+            print(True)
+            print('%s->%s:%s=>%s:%s' % (rid,head,tail,path[0],path[-1]))
     return ','.join(path)
 
 def main():
