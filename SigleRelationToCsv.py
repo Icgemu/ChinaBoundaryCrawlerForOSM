@@ -58,6 +58,10 @@ def process_relation(rid, out) :
     for i in range(1,len(ways_id),1) :
         sub = ways_id[i:]
         end_node_id = ways_dict[ways_id[i-1]][-1]
+        target_node_id = ways_dict[ways_id[0]][0]
+        if end_node_id == target_node_id:
+            ways_id = ways_id[0:i]
+            break
         # if end_node_id == '3981863987' :
         #     print("")
         ok = False

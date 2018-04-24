@@ -3,6 +3,7 @@ import codecs
 import requests
 from lxml import etree
 import math
+import random
 
 def distance(a,b):
     x = a[0] - b[0]
@@ -48,12 +49,48 @@ def process_relation(rid) :
     for way in ways :
         nd_rels = '//way[@id="'+ way +'"]/nd/@ref'
         nds = sel.xpath(nd_rels)
-        ways_dict[way] = nds
-        ways_id.append(way)
+        if nds[0] != nds[-1]:
+            ways_dict[way] = nds
+            ways_id.append(way)
     
+    # random.shuffle(ways_id)
+    ways_id = newmethod624(ways_id, ways_dict, rid, nodes_dict)
+
+        #print('%s->%s:%s' % (ways_dict[ways_id[i-1]][-1],ways_dict[ways_id[i]][0],ways_dict[ways_id[i-1]][-1]==ways_dict[ways_id[i]][0]))
+    
+    for way in ways_id :
+        #print("way->(%s/%s)" % (way,len(ways_id)))
+        #nd_rels = '//way[@id="'+ way +'"]/nd/@ref'
+        #nds = sel.xpath(nd_rels)
+        nds = ways_dict[way]
+        
+        for nd in nds :
+            #print("node->(%s/%s)" % (nd,len(nds)))
+            path.append(nodes_dict[nd].replace(',',' '))
+    if len(path) >0:
+        head = ways_dict[ways_id[0]][0]
+        tail = ways_dict[ways_id[-1]][-1]
+        if head != tail :
+            #print(True)
+            print('%s->%s:%s=>%s:%s' % (rid,head,tail,path[0],path[-1]))
+    return ','.join(path)
+
+def newmethod624(ways_id, ways_dict, rid, nodes_dict):
     for i in range(1,len(ways_id),1) :
         sub = ways_id[i:]
         end_node_id = ways_dict[ways_id[i-1]][-1]
+        target_node_id = ways_dict[ways_id[0]][0]
+        if end_node_id == target_node_id:
+            #print("target break")
+            old_len = len(ways_id)
+            ways_id = ways_id[0:i]
+            new_len = len(ways_id)
+            # rate = float(new_len)/old_len
+            # if rate < 0.2:
+            #     print(rid +','+ str(rate))
+            #     return process_relation(rid)
+            print('%s->%s/%s' % (rid,new_len,old_len))
+            break
         ok = False
         for k,v in enumerate(sub):
             if ways_dict[v][0] == end_node_id:
@@ -83,25 +120,7 @@ def process_relation(rid) :
             ways_id[i+k] = tmp
             if shortest_way[1] == 1:
                  ways_dict[v].reverse()
-
-        #print('%s->%s:%s' % (ways_dict[ways_id[i-1]][-1],ways_dict[ways_id[i]][0],ways_dict[ways_id[i-1]][-1]==ways_dict[ways_id[i]][0]))
-    
-    for way in ways_id :
-        #print("way->(%s/%s)" % (way,len(ways_id)))
-        #nd_rels = '//way[@id="'+ way +'"]/nd/@ref'
-        #nds = sel.xpath(nd_rels)
-        nds = ways_dict[way]
-        
-        for nd in nds :
-            #print("node->(%s/%s)" % (nd,len(nds)))
-            path.append(nodes_dict[nd].replace(',',' '))
-    if len(path) >0:
-        head = ways_dict[ways_id[0]][0]
-        tail = ways_dict[ways_id[-1]][-1]
-        if head != tail :
-            print(True)
-            print('%s->%s:%s=>%s:%s' % (rid,head,tail,path[0],path[-1]))
-    return ','.join(path)
+    return ways_id
 
 def main():
     f = codecs.open('rel.txt','r','utf-8')
@@ -110,8 +129,10 @@ def main():
         line = line.replace("\n", "")
         infs = line.split(';')  
         rid = infs[1]
-        path = process_relation(rid)
-        out.write('%s;%s\n' % (line, path))
+        #print(infs)
+        if(int(infs[4]) < 6):
+            path = process_relation(rid)
+            out.write('%s;%s\n' % (line, path))
     out.close()
     f.close()
     
