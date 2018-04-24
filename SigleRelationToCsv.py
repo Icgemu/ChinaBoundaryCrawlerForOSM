@@ -27,43 +27,15 @@ def find_shortest_distance(a, b_list):
         return x[0]
     dist_list.sort(key = cmp_fn)
     return dist_list[0]
-    
-def process_relation(rid, out) :
-    """
-    prosss relation
-    """
-    sel = etree.parse('boundary/'+rid+'.xml')
-    #path = []
-    ways_rel = '//relation[@id="'+ rid +'"]/member[@type="way"][@role="outer"]/@ref'
-    ways = sel.xpath(ways_rel)
-    #path = []
-    nodes_rel = '//node'
-    nodes = sel.xpath(nodes_rel)
-    nodes_dict = {}
-    for node in nodes :
-        id = node.get('id')
-        lon = node.get('lon')
-        lat = node.get('lat')
-        nodes_dict[id] = '%s,%s' % (lon, lat)
-    
-    ways_dict = {}
-    ways_id = []
-    #seq_nodes = []
-    for way in ways :
-        nd_rels = '//way[@id="'+ way +'"]/nd/@ref'
-        nds = sel.xpath(nd_rels)
-        ways_dict[way] = nds
-        ways_id.append(way)
+def find_region(ways_id,ways_dict,nodes_dict):
     
     for i in range(1,len(ways_id),1) :
         sub = ways_id[i:]
         end_node_id = ways_dict[ways_id[i-1]][-1]
         target_node_id = ways_dict[ways_id[0]][0]
         if end_node_id == target_node_id:
-            ways_id = ways_id[0:i]
-            break
-        # if end_node_id == '3981863987' :
-        #     print("")
+            return ways_id[0:i],sub
+            
         ok = False
         for k,v in enumerate(sub):
             if ways_dict[v][0] == end_node_id:
@@ -94,20 +66,57 @@ def process_relation(rid, out) :
             if shortest_way[1] == 1:
                  ways_dict[v].reverse()
 
-        print('%s->%s:%s' % (ways_dict[ways_id[i-1]][-1],ways_dict[ways_id[i]][0],ways_dict[ways_id[i-1]][-1]==ways_dict[ways_id[i]][0]))
+    return ways_id,[] 
+        #print('%s->%s:%s' % (ways_dict[ways_id[i-1]][-1],ways_dict[ways_id[i]][0],ways_dict[ways_id[i-1]][-1]==ways_dict[ways_id[i]][0]))
     
-    for way in ways_id :
-        #print("way->(%s/%s)" % (way,len(ways)))
-        #nd_rels = '//way[@id="'+ way +'"]/nd/@ref'
-        #nds = sel.xpath(nd_rels)
-        nds = ways_dict[way]
-        i = 0
-        for nd in nds :
-            #print("node->(%s/%s)" % (nd,len(nds)))
-            #path.append(nodes_dict[nd])
-            out.write('%s,%s,%s,%s\n' % (i,way, nd, nodes_dict[nd]))
-            i += 1
-    #return ','.join(path)
+def find_closed_region(ways_id, ways_dict, nodes_dict):
+    region_list = []
+    sub = ways_id
+    while len(sub) >0 :
+        closed_region , sub = find_region(sub, ways_dict, nodes_dict)
+        region_list.append(closed_region)
+    
+    return region_list
+   
+def process_relation(rid, out) :
+    """
+    prosss relation
+    """
+    sel = etree.parse('boundary/'+rid+'.xml')
+    #path = []
+    ways_rel = '//relation[@id="'+ rid +'"]/member[@type="way"][@role="outer"]/@ref'
+    ways = sel.xpath(ways_rel)
+    #path = []
+    nodes_rel = '//node'
+    nodes = sel.xpath(nodes_rel)
+    nodes_dict = {}
+    for node in nodes :
+        id = node.get('id')
+        lon = node.get('lon')
+        lat = node.get('lat')
+        nodes_dict[id] = '%s,%s' % (lon, lat)
+    
+    ways_dict = {}
+    ways_id = []
+    #seq_nodes = []
+    for way in ways :
+        nd_rels = '//way[@id="'+ way +'"]/nd/@ref'
+        nds = sel.xpath(nd_rels)
+        ways_dict[way] = nds
+        ways_id.append(way)
+    
+    region_list = find_closed_region(ways_id[:], ways_dict, nodes_dict)
+    #region_path = []
+    for region in region_list:
+        #path = []
+        print(region[0])
+        for way in region :
+            nds = ways_dict[way]
+            i = 0
+            for nd in nds :
+                out.write('%s,%s,%s,%s\n' % (i,way, nd, nodes_dict[nd]))
+                i += 1
+
 
 def main(rid):
     #f = codecs.open('rel.txt','r','utf-8')
