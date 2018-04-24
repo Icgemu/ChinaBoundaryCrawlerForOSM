@@ -54,28 +54,6 @@ def process_relation(rid) :
             ways_id.append(way)
     
     # random.shuffle(ways_id)
-    ways_id = newmethod624(ways_id, ways_dict, rid, nodes_dict)
-
-        #print('%s->%s:%s' % (ways_dict[ways_id[i-1]][-1],ways_dict[ways_id[i]][0],ways_dict[ways_id[i-1]][-1]==ways_dict[ways_id[i]][0]))
-    
-    for way in ways_id :
-        #print("way->(%s/%s)" % (way,len(ways_id)))
-        #nd_rels = '//way[@id="'+ way +'"]/nd/@ref'
-        #nds = sel.xpath(nd_rels)
-        nds = ways_dict[way]
-        
-        for nd in nds :
-            #print("node->(%s/%s)" % (nd,len(nds)))
-            path.append(nodes_dict[nd].replace(',',' '))
-    if len(path) >0:
-        head = ways_dict[ways_id[0]][0]
-        tail = ways_dict[ways_id[-1]][-1]
-        if head != tail :
-            #print(True)
-            print('%s->%s:%s=>%s:%s' % (rid,head,tail,path[0],path[-1]))
-    return ','.join(path)
-
-def newmethod624(ways_id, ways_dict, rid, nodes_dict):
     for i in range(1,len(ways_id),1) :
         sub = ways_id[i:]
         end_node_id = ways_dict[ways_id[i-1]][-1]
@@ -120,7 +98,25 @@ def newmethod624(ways_id, ways_dict, rid, nodes_dict):
             ways_id[i+k] = tmp
             if shortest_way[1] == 1:
                  ways_dict[v].reverse()
-    return ways_id
+
+        #print('%s->%s:%s' % (ways_dict[ways_id[i-1]][-1],ways_dict[ways_id[i]][0],ways_dict[ways_id[i-1]][-1]==ways_dict[ways_id[i]][0]))
+    
+    for way in ways_id :
+        #print("way->(%s/%s)" % (way,len(ways_id)))
+        #nd_rels = '//way[@id="'+ way +'"]/nd/@ref'
+        #nds = sel.xpath(nd_rels)
+        nds = ways_dict[way]
+        
+        for nd in nds :
+            #print("node->(%s/%s)" % (nd,len(nds)))
+            path.append(nodes_dict[nd].replace(',',' '))
+    if len(path) >0:
+        head = ways_dict[ways_id[0]][0]
+        tail = ways_dict[ways_id[-1]][-1]
+        if head != tail :
+            #print(True)
+            print('%s->%s:%s=>%s:%s' % (rid,head,tail,path[0],path[-1]))
+    return ','.join(path)
 
 def main():
     f = codecs.open('rel.txt','r','utf-8')
