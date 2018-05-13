@@ -105,5 +105,6 @@ ENV/
 *.csv
 *.txt
 boundary/
+network/
 *.tar.gz
 *.json
