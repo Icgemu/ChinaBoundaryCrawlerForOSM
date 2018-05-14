@@ -106,5 +106,6 @@ ENV/
 *.txt
 boundary/
 network/
+shp/
 *.tar.gz
 *.json

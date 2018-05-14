@@ -65,7 +65,7 @@ def getRelation (rid, out) :
             k = tag.get('k')
             v = tag.get('v')
             way_tags.append('%s=%s' % (k,v))
-        out.write('w|%s|%s|%s|%s|%s\n' % (ref, s_id, e_id,','.join(lon_lat_seq),';'.join(way_tags)))
+        out.write('w|%s|%s|%s|%s|%s|%s\n' % (rid, ref, s_id, e_id,','.join(lon_lat_seq),';'.join(way_tags)))
 
 
 def getPage (url, fileName):
